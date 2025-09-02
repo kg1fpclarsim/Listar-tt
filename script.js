@@ -1,15 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ####################################################################
-    // ### DITT JOBB: FYLL I ALLA KOORDINATER I DENNA SEKTION           ###
+    // ### STEG 1: ÄNDRA VÄRDET NEDAN                                   ###
     // ####################################################################
-    //
-    // Hitta koordinater (top, left, width, height) i pixlar för varje
-    // knapp på dina tre bilder:
-    // 1. handdator.png (huvudmenyn)
-    // 2. handdator-hamta.png (undermenyn för "Hämta")
-    // 3. handdator-flansa.png (undermenyn för "Flänsa")
-    //
+    // Ersätt 430 med den verkliga bredden i pixlar på din `handdator.png`-fil.
+    const ORIGINAL_IMAGE_WIDTH = 426; 
+    // ####################################################################
+
     const topLevelMenu = {
+        // ... (din topLevelMenu-struktur med alla koordinater är oförändrad) ...
         image: 'handdator.png',
         events: [
             { name: "Lasta ut", coords: { top:  197, left: 71, width: 138, height: 76 } },
@@ -19,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 287, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-hamta.png',
-                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 }, // KORRIGERAD: "width"
+                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 },
                     events: [
                         { name: "Hämta åt annan bil", coords: { top: 295, left: 70, width: 185, height: 30 } },
                         { name: "Hämta obokad hämtning", coords: { top: 240, left: 70, width: 185, height: 30 } }
@@ -36,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 552, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-flansa.png',
-                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 }, // KORRIGERAD: "width"
+                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 },
                     events: [
                         { name: "Flänsa på", coords: { top: 197, left: 71, width: 138, height: 76 } },
                         { name: "Flänsa av", coords: { top: 197, left: 221, width: 138, height: 76 } }
@@ -45,9 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         ]
     };
-    // ####################################################################
-    // ### SLUT PÅ SEKTIONEN DU BEHÖVER REDIGERA                        ###
-    // ####################################################################
 
     let scenarioSequence = [];
     let currentStep = 0;
@@ -58,12 +53,85 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.getElementById('image-container');
     const navOverlay = document.getElementById('navigation-overlay');
     const scenarioTitle = document.getElementById('scenario-title');
-    // KORRIGERAD: Rätt deklaration, utan den felplacerade logiken.
     const scenarioDescription = document.getElementById('scenario-description');
     const feedbackMessage = document.getElementById('feedback-message');
     const feedbackArea = document.getElementById('feedback-area');
     const resetButton = document.getElementById('reset-button');
+    
+    // --- NY FUNKTION FÖR OMSKALNING ---
+    function scaleClickableAreas() {
+        const scaleRatio = gameImage.offsetWidth / ORIGINAL_IMAGE_WIDTH;
+        if (!scaleRatio) return; // Gör inget om bilden inte är synlig
 
+        // Skala om knapparna i huvudfönstret
+        imageContainer.querySelectorAll('.clickable-area').forEach(area => {
+            const originalCoords = area.dataset.originalCoords.split(',').map(Number);
+            area.style.top = `${originalCoords[0] * scaleRatio}px`;
+            area.style.left = `${originalCoords[1] * scaleRatio}px`;
+            area.style.width = `${originalCoords[2] * scaleRatio}px`;
+            area.style.height = `${originalCoords[3] * scaleRatio}px`;
+        });
+        
+        // Skala om "Tillbaka"-knappen
+        const backArea = navOverlay.querySelector('.clickable-area');
+        if (backArea) {
+            const originalCoords = backArea.dataset.originalCoords.split(',').map(Number);
+            backArea.style.top = `${originalCoords[0] * scaleRatio}px`;
+            backArea.style.left = `${originalCoords[1] * scaleRatio}px`;
+            backArea.style.width = `${originalCoords[2] * scaleRatio}px`;
+            backArea.style.height = `${originalCoords[3] * scaleRatio}px`;
+        }
+    }
+
+    // Funktioner för att byta vy, skapa knappar, hantera klick etc.
+    function switchMenuView(menuData) {
+        currentMenuView = menuData;
+        gameImage.src = menuData.image;
+        
+        // Vänta på att den nya bilden laddas innan vi ritar och skalar om knapparna
+        gameImage.onload = () => {
+            createClickableAreas(menuData.events);
+            createBackButton(menuData);
+            scaleClickableAreas(); // Skala om direkt när bilden är laddad
+        };
+    }
+
+    // Separat funktion för att skapa tillbaka-knappen
+    function createBackButton(menuData) {
+        navOverlay.innerHTML = '';
+        if (menuData.backButtonCoords) {
+            const backArea = document.createElement('div');
+            backArea.classList.add('clickable-area');
+            const coords = menuData.backButtonCoords;
+            // Spara original-koordinaterna på elementet
+            backArea.dataset.originalCoords = [coords.top, coords.left, coords.width, coords.height];
+            backArea.addEventListener('click', () => {
+                if (menuHistory.length > 0) {
+                    const previousMenu = menuHistory.pop();
+                    switchMenuView(previousMenu);
+                }
+            });
+            navOverlay.appendChild(backArea);
+        }
+    }
+    
+    // Uppdaterad för att spara original-koordinaterna
+    function createClickableAreas(eventsToCreate) {
+        imageContainer.querySelectorAll('.clickable-area').forEach(area => area.remove());
+        if (!eventsToCreate) return;
+        
+        eventsToCreate.forEach(event => {
+            const area = document.createElement('div');
+            area.classList.add('clickable-area');
+            const coords = event.coords;
+            // Spara original-koordinaterna på elementet
+            area.dataset.originalCoords = [coords.top, coords.left, coords.width, coords.height];
+            area.addEventListener('click', () => handleEventClick(event, area));
+            imageContainer.appendChild(area);
+        });
+    }
+
+    // Alla andra funktioner (loadRandomScenario, resetGameState, handleEventClick) är oförändrade
     async function loadRandomScenario() {
         try {
             const response = await fetch('scenarios.json?cachebust=' + new Date().getTime());
@@ -76,17 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 imageContainer.style.display = 'none';
                 return;
             }
-            
             const randomScenario = allScenarios[Math.floor(Math.random() * allScenarios.length)];
-            
             scenarioSequence = randomScenario.sequence;
             scenarioTitle.textContent = "Övning";
-            
-            // KORRIGERAD: Använder marked.parse här, där det hör hemma.
             scenarioDescription.innerHTML = marked.parse(randomScenario.description);
-            
             resetGameState();
-
         } catch (error) {
             console.error("Fel vid laddning av scenario:", error);
             scenarioTitle.textContent = "Ett fel uppstod";
@@ -103,79 +165,32 @@ document.addEventListener('DOMContentLoaded', () => {
         switchMenuView(topLevelMenu);
     }
 
-    function switchMenuView(menuData) {
-        currentMenuView = menuData;
-        gameImage.src = menuData.image;
-        createClickableAreas(menuData.events);
-
-        navOverlay.innerHTML = ''; // Rensa eventuella gamla knappar/ytor
-        
-        // Om den nuvarande menyn har koordinater för en tillbaka-knapp
-        if (menuData.backButtonCoords) {
-            const backArea = document.createElement('div');
-            backArea.classList.add('clickable-area'); // Återanvänd samma stil
-            backArea.style.top = `${menuData.backButtonCoords.top}px`;
-            backArea.style.left = `${menuData.backButtonCoords.left}px`;
-            backArea.style.width = `${menuData.backButtonCoords.width}px`;
-            backArea.style.height = `${menuData.backButtonCoords.height}px`;
-
-            backArea.addEventListener('click', () => {
-                if (menuHistory.length > 0) {
-                    const previousMenu = menuHistory.pop();
-                    switchMenuView(previousMenu);
-                }
-            });
-            navOverlay.appendChild(backArea);
-        }
-    }
-    
-    function createClickableAreas(eventsToCreate) {
-        imageContainer.querySelectorAll('.clickable-area').forEach(area => area.remove());
-        if (!eventsToCreate) return;
-        
-        eventsToCreate.forEach(event => {
-            const area = document.createElement('div');
-            area.classList.add('clickable-area');
-            area.style.top = `${event.coords.top}px`;
-            area.style.left = `${event.coords.left}px`;
-            area.style.width = `${event.coords.width}px`;
-            area.style.height = `${event.coords.height}px`;
-            area.addEventListener('click', () => handleEventClick(event, area));
-            imageContainer.appendChild(area);
-        });
-    }
-
     function handleEventClick(clickedEvent, areaElement) {
         if (!scenarioSequence || scenarioSequence.length === 0) return;
-        
         const isFinished = currentStep >= scenarioSequence.length;
         if(isFinished) return;
-
         if (clickedEvent.name === scenarioSequence[currentStep]) {
             feedbackMessage.textContent = `Korrekt! "${clickedEvent.name}" var rätt steg.`;
             feedbackArea.className = 'feedback-correct';
             areaElement.classList.add('area-correct-feedback');
             areaElement.style.pointerEvents = 'none';
             currentStep++;
-
-            // NYTT TILLÄGG: Gå tillbaka till huvudmenyn automatiskt
-            // Om vi är i en undermeny (historik finns) och valet inte har en egen undermeny.
+            const isComplete = currentStep === scenarioSequence.length;
             if (menuHistory.length > 0 && !clickedEvent.submenu) {
-                // Vänta en kort stund så användaren ser feedback, sedan gå tillbaka.
                 setTimeout(() => {
-                    menuHistory = []; // Rensa historiken
+                    menuHistory = [];
                     switchMenuView(topLevelMenu);
-                }, 700); // 0.7 sekunders fördröjning
-                return; // Avsluta här för att inte processa nästa if-sats
+                    if (isComplete) {
+                        feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
+                        feedbackArea.className = 'feedback-correct';
+                    }
+                }, 700);
+                return;
             }
-            
-            // Kolla om spelet är slutfört
-            if (currentStep === scenarioSequence.length) {
+            if (isComplete) {
                 feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
                 feedbackArea.className = 'feedback-correct';
             }
-            
-            // Byt till undermeny om det finns en
             if (clickedEvent.submenu) {
                 menuHistory.push(currentMenuView);
                 switchMenuView(clickedEvent.submenu);
@@ -188,6 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    resetButton.addEventListener('click', loadRandomScenario);
+    // --- LYSSNA EFTER FÖNSTERÄNDRING ---
+    // Kör funktionen för omskalning när fönstrets storlek ändras
+    window.addEventListener('resize', scaleClickableAreas);
+
+    // Starta spelet
     loadRandomScenario(); 
 });
