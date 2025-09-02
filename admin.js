@@ -1,12 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Samma lista över alla möjliga händelser som i spelet
-    const ALL_EVENTS = [
-        "Lasta ut", "Lossa in", "Hämta", "Leverera", "Bomhämtning", 
-        "Ej levererat", "Hämtning utan sändnings-ID", "Åter terminal", "Flänsa"
-    ];
+    // ... (behåll `ALL_EVENTS`-listan som förut) ...
+    const ALL_EVENTS = [ /* ... din lista med alla 9 händelser ... */ ];
 
     let currentSequence = [];
-    let scenarios = JSON.parse(localStorage.getItem('drivingScenarios')) || [];
+    let scenarios = []; // Starta med en tom lista, vi laddar från fil
+
+    // Uppdatera HTML-elementen för att inkludera den nya export-rutan
+    document.querySelector('.card:nth-of-type(1)').innerHTML += `
+        <div class="export-container">
+            <h3>Exportera för GitHub</h3>
+            <p>När du är klar, klicka på "Generera JSON". Kopiera texten från rutan och klistra in den i 
+            <code>scenarios.json</code>-filen i ditt GitHub-projekt.</p>
+            <button id="export-btn" class="btn btn-primary">Generera JSON</button>
+            <textarea id="json-output" readonly></textarea>
+        </div>
+    `;
 
     const descriptionInput = document.getElementById('scenario-description');
     const availableButtonsContainer = document.getElementById('available-buttons');
@@ -14,93 +22,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveButton = document.getElementById('save-scenario-btn');
     const clearButton = document.getElementById('clear-sequence-btn');
     const scenariosList = document.getElementById('scenarios-list');
+    const exportButton = document.getElementById('export-btn');
+    const jsonOutput = document.getElementById('json-output');
 
-    // --- Funktioner ---
-
-    function renderAvailableButtons() {
-        availableButtonsContainer.innerHTML = '';
-        ALL_EVENTS.forEach(event => {
-            const btn = document.createElement('button');
-            btn.textContent = event;
-            btn.className = 'btn';
-            btn.addEventListener('click', () => {
-                currentSequence.push(event);
-                renderSelectedSequence();
-            });
-            availableButtonsContainer.appendChild(btn);
-        });
-    }
-
-    function renderSelectedSequence() {
-        selectedSequenceContainer.innerHTML = '';
-        if (currentSequence.length === 0) {
-            selectedSequenceContainer.innerHTML = '<p><em>Inga steg valda.</em></p>';
-            return;
+    // Ladda befintliga scenarier från filen när sidan startar
+    async function loadExistingScenarios() {
+        try {
+            const response = await fetch('scenarios.json');
+            if (response.ok) {
+                scenarios = await response.json();
+                renderScenariosList();
+            }
+        } catch (error) {
+            console.warn("Kunde inte ladda befintlig scenarios.json, startar med en tom lista.", error);
         }
-        currentSequence.forEach((step, index) => {
-            const stepEl = document.createElement('span');
-            stepEl.className = 'sequence-step';
-            stepEl.textContent = `${index + 1}. ${step}`;
-            selectedSequenceContainer.appendChild(stepEl);
-        });
     }
-
-    function renderScenariosList() {
-        scenariosList.innerHTML = '';
-        if (scenarios.length === 0) {
-            scenariosList.innerHTML = '<p>Inga scenarier sparade ännu.</p>';
-            return;
-        }
-        scenarios.forEach((scenario, index) => {
-            const listItem = document.createElement('li');
-            listItem.innerHTML = `
-                <strong>${scenario.description}</strong>
-                <br>
-                <small>${scenario.sequence.join(' → ')}</small>
-                <button class="delete-btn" data-index="${index}">Ta bort</button>
-            `;
-            scenariosList.appendChild(listItem);
-        });
-        
-        // Lägg till event listeners för de nya delete-knapparna
-        document.querySelectorAll('.delete-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const indexToDelete = parseInt(e.target.dataset.index, 10);
-                scenarios.splice(indexToDelete, 1);
-                saveAndRenderAll();
-            });
-        });
-    }
-
-    function saveAndRenderAll() {
-        localStorage.setItem('drivingScenarios', JSON.stringify(scenarios));
-        renderSelectedSequence();
-        renderScenariosList();
-    }
-
-    // --- Event Listeners ---
     
+    // ... (Behåll `renderAvailableButtons`, `renderSelectedSequence` som förut) ...
+    function renderAvailableButtons() { /* ... din kod här ... */ }
+    function renderSelectedSequence() { /* ... din kod här ... */ }
+
+    // Uppdatera renderScenariosList för att fungera med den nya datan
+    function renderScenariosList() {
+        // ... (denna funktion kan behållas nästan exakt som den var, men den anropar inte localStorage) ...
+    }
+
+    // Event listener för Spara-knappen (sparar bara i minnet, inte localStorage)
     saveButton.addEventListener('click', () => {
         const description = descriptionInput.value.trim();
         if (description === '' || currentSequence.length === 0) {
-            alert('Du måste ange en beskrivning och välja minst ett steg i sekvensen.');
+            alert('Du måste ange en beskrivning och välja minst ett steg.');
             return;
         }
-        scenarios.push({
-            description: description,
-            sequence: currentSequence
-        });
+        scenarios.push({ description: description, sequence: currentSequence });
         descriptionInput.value = '';
         currentSequence = [];
-        saveAndRenderAll();
-    });
-
-    clearButton.addEventListener('click', () => {
-        currentSequence = [];
         renderSelectedSequence();
+        renderScenariosList();
+        jsonOutput.value = ''; // Rensa exportrutan eftersom datan är inaktuell
     });
 
-    // --- Initiering ---
+    // Event listener för Export-knappen
+    exportButton.addEventListener('click', () => {
+        // JSON.stringify med 'null, 2' gör texten vackert formatterad och lättläst
+        const jsonString = JSON.stringify(scenarios, null, 2);
+        jsonOutput.value = jsonString;
+        jsonOutput.select(); // Markera all text så den är lätt att kopiera
+        alert('JSON genererad! Kopiera texten från rutan nedan.');
+    });
+
+    // ... (Behåll övriga event listeners och initieringsanrop) ...
+    // Se till att din `renderScenariosList` också uppdateras för att inte använda localStorage
+    // Och glöm inte att anropa loadExistingScenarios() vid start.
+
+    loadExistingScenarios();
     renderAvailableButtons();
-    saveAndRenderAll();
+    renderSelectedSequence();
 });
