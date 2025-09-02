@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 287, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-hamta.png',
-                    backButtonCoords: { top: 145, left: 70, with: 20, height: 25 },
+                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 }, // KORRIGERAD: "width"
                     events: [
                         { name: "Hämta åt annan bil", coords: { top: 295, left: 70, width: 185, height: 30 } },
                         { name: "Hämta obokad hämtning", coords: { top: 240, left: 70, width: 185, height: 30 } }
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 552, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-flansa.png',
-                    backButtonCoords: { top: 145, left: 70, with: 20, height: 25 },
+                    backButtonCoords: { top: 145, left: 70, width: 20, height: 25 }, // KORRIGERAD: "width"
                     events: [
                         { name: "Flänsa på", coords: { top: 197, left: 71, width: 138, height: 76 } },
                         { name: "Flänsa av", coords: { top: 197, left: 221, width: 138, height: 76 } }
@@ -58,7 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageContainer = document.getElementById('image-container');
     const navOverlay = document.getElementById('navigation-overlay');
     const scenarioTitle = document.getElementById('scenario-title');
-    const scenarioDescription.innerHTML = marked.parse(randomScenario.description);
+    // KORRIGERAD: Rätt deklaration, utan den felplacerade logiken.
+    const scenarioDescription = document.getElementById('scenario-description');
     const feedbackMessage = document.getElementById('feedback-message');
     const feedbackArea = document.getElementById('feedback-area');
     const resetButton = document.getElementById('reset-button');
@@ -80,7 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             scenarioSequence = randomScenario.sequence;
             scenarioTitle.textContent = "Övning";
-            scenarioDescription.textContent = randomScenario.description;
+            
+            // KORRIGERAD: Använder marked.parse här, där det hör hemma.
+            scenarioDescription.innerHTML = marked.parse(randomScenario.description);
             
             resetGameState();
 
@@ -100,31 +103,31 @@ document.addEventListener('DOMContentLoaded', () => {
         switchMenuView(topLevelMenu);
     }
 
-  function switchMenuView(menuData) {
-    currentMenuView = menuData;
-    gameImage.src = menuData.image;
-    createClickableAreas(menuData.events);
+    function switchMenuView(menuData) {
+        currentMenuView = menuData;
+        gameImage.src = menuData.image;
+        createClickableAreas(menuData.events);
 
-    navOverlay.innerHTML = ''; // Rensa eventuella gamla knappar/ytor
-    
-    // Om den nuvarande menyn har koordinater för en tillbaka-knapp
-    if (menuData.backButtonCoords) {
-        const backArea = document.createElement('div');
-        backArea.classList.add('clickable-area'); // Återanvänd samma stil
-        backArea.style.top = `${menuData.backButtonCoords.top}px`;
-        backArea.style.left = `${menuData.backButtonCoords.left}px`;
-        backArea.style.width = `${menuData.backButtonCoords.width}px`;
-        backArea.style.height = `${menuData.backButtonCoords.height}px`;
+        navOverlay.innerHTML = ''; // Rensa eventuella gamla knappar/ytor
+        
+        // Om den nuvarande menyn har koordinater för en tillbaka-knapp
+        if (menuData.backButtonCoords) {
+            const backArea = document.createElement('div');
+            backArea.classList.add('clickable-area'); // Återanvänd samma stil
+            backArea.style.top = `${menuData.backButtonCoords.top}px`;
+            backArea.style.left = `${menuData.backButtonCoords.left}px`;
+            backArea.style.width = `${menuData.backButtonCoords.width}px`;
+            backArea.style.height = `${menuData.backButtonCoords.height}px`;
 
-        backArea.addEventListener('click', () => {
-            if (menuHistory.length > 0) {
-                const previousMenu = menuHistory.pop();
-                switchMenuView(previousMenu);
-            }
-        });
-        navOverlay.appendChild(backArea);
+            backArea.addEventListener('click', () => {
+                if (menuHistory.length > 0) {
+                    const previousMenu = menuHistory.pop();
+                    switchMenuView(previousMenu);
+                }
+            });
+            navOverlay.appendChild(backArea);
+        }
     }
-}
     
     function createClickableAreas(eventsToCreate) {
         imageContainer.querySelectorAll('.clickable-area').forEach(area => area.remove());
@@ -143,47 +146,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleEventClick(clickedEvent, areaElement) {
-    if (!scenarioSequence || scenarioSequence.length === 0) return;
-    
-    const isFinished = currentStep >= scenarioSequence.length;
-    if(isFinished) return;
-
-    if (clickedEvent.name === scenarioSequence[currentStep]) {
-        feedbackMessage.textContent = `Korrekt! "${clickedEvent.name}" var rätt steg.`;
-        feedbackArea.className = 'feedback-correct';
-        areaElement.classList.add('area-correct-feedback');
-        areaElement.style.pointerEvents = 'none';
-        currentStep++;
-
-        // NYTT TILLÄGG: Gå tillbaka till huvudmenyn automatiskt
-        // Om vi är i en undermeny (historik finns) och valet inte har en egen undermeny.
-        if (menuHistory.length > 0 && !clickedEvent.submenu) {
-            // Vänta en kort stund så användaren ser feedback, sedan gå tillbaka.
-            setTimeout(() => {
-                menuHistory = []; // Rensa historiken
-                switchMenuView(topLevelMenu);
-            }, 700); // 0.7 sekunders fördröjning
-            return; // Avsluta här för att inte processa nästa if-sats
-        }
+        if (!scenarioSequence || scenarioSequence.length === 0) return;
         
-        // Kolla om spelet är slutfört
-        if (currentStep === scenarioSequence.length) {
-            feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
+        const isFinished = currentStep >= scenarioSequence.length;
+        if(isFinished) return;
+
+        if (clickedEvent.name === scenarioSequence[currentStep]) {
+            feedbackMessage.textContent = `Korrekt! "${clickedEvent.name}" var rätt steg.`;
             feedbackArea.className = 'feedback-correct';
+            areaElement.classList.add('area-correct-feedback');
+            areaElement.style.pointerEvents = 'none';
+            currentStep++;
+
+            // NYTT TILLÄGG: Gå tillbaka till huvudmenyn automatiskt
+            // Om vi är i en undermeny (historik finns) och valet inte har en egen undermeny.
+            if (menuHistory.length > 0 && !clickedEvent.submenu) {
+                // Vänta en kort stund så användaren ser feedback, sedan gå tillbaka.
+                setTimeout(() => {
+                    menuHistory = []; // Rensa historiken
+                    switchMenuView(topLevelMenu);
+                }, 700); // 0.7 sekunders fördröjning
+                return; // Avsluta här för att inte processa nästa if-sats
+            }
+            
+            // Kolla om spelet är slutfört
+            if (currentStep === scenarioSequence.length) {
+                feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
+                feedbackArea.className = 'feedback-correct';
+            }
+            
+            // Byt till undermeny om det finns en
+            if (clickedEvent.submenu) {
+                menuHistory.push(currentMenuView);
+                switchMenuView(clickedEvent.submenu);
+            }
+        } else {
+            feedbackMessage.textContent = `Fel ordning. Försök igen.`;
+            feedbackArea.className = 'feedback-incorrect';
+            areaElement.classList.add('area-incorrect-feedback');
+            setTimeout(() => { areaElement.classList.remove('area-incorrect-feedback'); }, 500);
         }
-        
-        // Byt till undermeny om det finns en
-        if (clickedEvent.submenu) {
-            menuHistory.push(currentMenuView);
-            switchMenuView(clickedEvent.submenu);
-        }
-    } else {
-        feedbackMessage.textContent = `Fel ordning. Försök igen.`;
-        feedbackArea.className = 'feedback-incorrect';
-        areaElement.classList.add('area-incorrect-feedback');
-        setTimeout(() => { areaElement.classList.remove('area-incorrect-feedback'); }, 500);
     }
-}
 
     resetButton.addEventListener('click', loadRandomScenario);
     loadRandomScenario(); 
