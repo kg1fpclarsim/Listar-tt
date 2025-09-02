@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Skapa Scenarier</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="admin-container">
+        <h1>Admin: Skapa & Hantera Scenarier</h1>
+        
+        <div class="card">
+            <h2>Skapa Nytt Scenario</h2>
+            <label for="scenario-description">Beskrivning av scenariot:</label>
+            <input type="text" id="scenario-description" placeholder="Ex: Lyckad leverans till företag">
+            
+            <p>Klicka på knapparna nedan i den ordning som är korrekt för scenariot:</p>
+            <div id="available-buttons" class="button-grid">
+                </div>
+            
+            <h3>Vald sekvens:</h3>
+            <div id="selected-sequence" class="sequence-display"></div>
+            
+            <button id="save-scenario-btn" class="btn btn-primary">Spara Scenario</button>
+            <button id="clear-sequence-btn" class="btn btn-secondary">Rensa Sekvens</button>
+        </div>
+
+        <div class="card">
+            <h2>Sparade Scenarier</h2>
+            <ul id="scenarios-list">
+                </ul>
+        </div>
+    </div>
+    <script src="admin.js"></script>
+</body>
+</html>
