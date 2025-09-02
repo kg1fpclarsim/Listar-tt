@@ -100,23 +100,31 @@ document.addEventListener('DOMContentLoaded', () => {
         switchMenuView(topLevelMenu);
     }
 
-    function switchMenuView(menuData) {
-        currentMenuView = menuData;
-        gameImage.src = menuData.image;
-        createClickableAreas(menuData.events);
+  function switchMenuView(menuData) {
+    currentMenuView = menuData;
+    gameImage.src = menuData.image;
+    createClickableAreas(menuData.events);
 
-        navOverlay.innerHTML = '';
-        if (menuHistory.length > 0) {
-            const backBtn = document.createElement('button');
-            backBtn.textContent = '‹ Tillbaka';
-            backBtn.className = 'back-btn';
-            backBtn.addEventListener('click', () => {
+    navOverlay.innerHTML = ''; // Rensa eventuella gamla knappar/ytor
+    
+    // Om den nuvarande menyn har koordinater för en tillbaka-knapp
+    if (menuData.backButtonCoords) {
+        const backArea = document.createElement('div');
+        backArea.classList.add('clickable-area'); // Återanvänd samma stil
+        backArea.style.top = `${menuData.backButtonCoords.top}px`;
+        backArea.style.left = `${menuData.backButtonCoords.left}px`;
+        backArea.style.width = `${menuData.backButtonCoords.width}px`;
+        backArea.style.height = `${menuData.backButtonCoords.height}px`;
+
+        backArea.addEventListener('click', () => {
+            if (menuHistory.length > 0) {
                 const previousMenu = menuHistory.pop();
                 switchMenuView(previousMenu);
-            });
-            navOverlay.appendChild(backBtn);
-        }
+            }
+        });
+        navOverlay.appendChild(backArea);
     }
+}
     
     function createClickableAreas(eventsToCreate) {
         imageContainer.querySelectorAll('.clickable-area').forEach(area => area.remove());
