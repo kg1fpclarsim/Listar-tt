@@ -4,6 +4,16 @@
     "sequence": [
       "Flänsa på"
     ]
+  },
+  {
+    "description": "Test",
+    "sequence": [
+      "Hämta",
+      "Lossa in",
+      "Lasta ut",
+      "Lossa in",
+      "Lasta ut",
+      "Leverera"
+    ]
   }
 ]
-
