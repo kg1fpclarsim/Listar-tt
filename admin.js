@@ -17,6 +17,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const scenariosList = document.getElementById('scenarios-list');
     const exportButton = document.getElementById('export-btn');
     const jsonOutput = document.getElementById('json-output');
+    // I toppen av admin.js, efter de andra const-definitionerna
+const descriptionPreview = document.getElementById('description-preview');
+
+// Lyssna efter inmatning i textrutan
+descriptionInput.addEventListener('input', () => {
+    // Använd marked-biblioteket för att omvandla text till HTML
+    descriptionPreview.innerHTML = marked.parse(descriptionInput.value);
+});
+
+// Anropa funktionen en gång vid start för att rensa
+descriptionPreview.innerHTML = marked.parse('');
 
     async function loadExistingScenarios() {
         try {
