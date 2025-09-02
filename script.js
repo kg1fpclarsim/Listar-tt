@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 287, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-hamta.png',
+                    backButtonCoords: { top: 145, left: 70, with: 20, height: 25 },
                     events: [
                         { name: "Hämta åt annan bil", coords: { top: 295, left: 70, width: 185, height: 30 } },
                         { name: "Hämta obokad hämtning", coords: { top: 240, left: 70, width: 185, height: 30 } }
@@ -35,6 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 coords: { top: 552, left: 71, width: 138, height: 76 },
                 submenu: {
                     image: 'handdator-flansa.png',
+                    backButtonCoords: { top: 145, left: 70, with: 20, height: 25 },
                     events: [
                         { name: "Flänsa på", coords: { top: 197, left: 71, width: 138, height: 76 } },
                         { name: "Flänsa av", coords: { top: 197, left: 221, width: 138, height: 76 } }
