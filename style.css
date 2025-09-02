@@ -10,20 +10,35 @@ body {
     box-sizing: border-box;
 }
 
+/* --- Gemensamma stilar för båda behållarna --- */
 .game-container, .admin-container {
     background-color: #ffffff;
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
     width: 90%;
 }
-.game-container { max-width: 600px; }
-.admin-container { max-width: 800px; }
+
+/* --- Specifika stilar för SPEL-behållaren --- */
+.game-container {
+    max-width: 600px;
+    /* Använd Flexbox för robust vertikal och horisontell centrering */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* --- Specifika stilar för ADMIN-behållaren --- */
+.admin-container {
+    max-width: 800px;
+    /* Den gamla metoden fungerar utmärkt för admin-sidans innehåll */
+    text-align: center;
+}
 
 h1 { color: #333; }
 
 /* --- Spel-specifika stilar --- */
+/* (Resten av din CSS fortsätter här...) */
 #image-container {
     position: relative;
     display: inline-block;
