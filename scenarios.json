@@ -1,18 +1,9 @@
 [
   {
-    "description": "Du ska påbörja ditt arbetspass som Lots. Du blir tilldelad en bil och ett antal sändningar som du ska leverera av din arbetsledare, hur registrerar du dom i handdatorn?",
-    "sequence": [
-      "Flänsa på"
-    ]
-  },
-  {
     "description": "Test",
     "sequence": [
-      "Hämta",
-      "Lossa in",
-      "Lasta ut",
-      "Lossa in",
-      "Lasta ut",
+      "Flänsa",
+      "Flänsa på",
       "Leverera"
     ]
   }
