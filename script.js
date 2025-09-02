@@ -133,34 +133,47 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleEventClick(clickedEvent, areaElement) {
-        if (!scenarioSequence || scenarioSequence.length === 0) return;
-        
-        const isFinished = currentStep >= scenarioSequence.length;
-        if(isFinished) return;
+    if (!scenarioSequence || scenarioSequence.length === 0) return;
+    
+    const isFinished = currentStep >= scenarioSequence.length;
+    if(isFinished) return;
 
-        if (clickedEvent.name === scenarioSequence[currentStep]) {
-            feedbackMessage.textContent = `Korrekt! "${clickedEvent.name}" var rätt steg.`;
-            feedbackArea.className = 'feedback-correct';
-            areaElement.classList.add('area-correct-feedback');
-            areaElement.style.pointerEvents = 'none';
-            currentStep++;
+    if (clickedEvent.name === scenarioSequence[currentStep]) {
+        feedbackMessage.textContent = `Korrekt! "${clickedEvent.name}" var rätt steg.`;
+        feedbackArea.className = 'feedback-correct';
+        areaElement.classList.add('area-correct-feedback');
+        areaElement.style.pointerEvents = 'none';
+        currentStep++;
 
-            if (currentStep === scenarioSequence.length) {
-                feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
-                feedbackArea.className = 'feedback-correct';
-            }
-
-            if (clickedEvent.submenu) {
-                menuHistory.push(currentMenuView);
-                switchMenuView(clickedEvent.submenu);
-            }
-        } else {
-            feedbackMessage.textContent = `Fel ordning. Försök igen.`;
-            feedbackArea.className = 'feedback-incorrect';
-            areaElement.classList.add('area-incorrect-feedback');
-            setTimeout(() => { areaElement.classList.remove('area-incorrect-feedback'); }, 500);
+        // NYTT TILLÄGG: Gå tillbaka till huvudmenyn automatiskt
+        // Om vi är i en undermeny (historik finns) och valet inte har en egen undermeny.
+        if (menuHistory.length > 0 && !clickedEvent.submenu) {
+            // Vänta en kort stund så användaren ser feedback, sedan gå tillbaka.
+            setTimeout(() => {
+                menuHistory = []; // Rensa historiken
+                switchMenuView(topLevelMenu);
+            }, 700); // 0.7 sekunders fördröjning
+            return; // Avsluta här för att inte processa nästa if-sats
         }
+        
+        // Kolla om spelet är slutfört
+        if (currentStep === scenarioSequence.length) {
+            feedbackMessage.textContent = 'Bra gjort! Hela sekvensen är korrekt.';
+            feedbackArea.className = 'feedback-correct';
+        }
+        
+        // Byt till undermeny om det finns en
+        if (clickedEvent.submenu) {
+            menuHistory.push(currentMenuView);
+            switchMenuView(clickedEvent.submenu);
+        }
+    } else {
+        feedbackMessage.textContent = `Fel ordning. Försök igen.`;
+        feedbackArea.className = 'feedback-incorrect';
+        areaElement.classList.add('area-incorrect-feedback');
+        setTimeout(() => { areaElement.classList.remove('area-incorrect-feedback'); }, 500);
     }
+}
 
     resetButton.addEventListener('click', loadRandomScenario);
     loadRandomScenario(); 
