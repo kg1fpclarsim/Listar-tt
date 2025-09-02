@@ -1,87 +1,84 @@
-body {
-    font-family: sans-serif;
-    background-color: #f0f2f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
-
-.game-container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
+/* --- Stilar för Admin-sidan --- */
+.admin-container {
     width: 90%;
-    max-width: 500px;
+    max-width: 800px;
 }
 
-h1 {
-    color: #333;
+.card {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
 }
 
-#event-buttons {
-    display: grid;
-    grid-template-columns: 1fr;
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.button-grid {
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
-    margin: 20px 0;
+    margin-bottom: 15px;
 }
 
-.event-btn {
+.sequence-display {
+    padding: 10px;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    min-height: 40px;
+    margin-bottom: 15px;
+}
+
+.sequence-step {
+    display: inline-block;
+    background-color: #e9ecef;
+    padding: 5px 10px;
+    border-radius: 15px;
+    margin-right: 5px;
+    margin-bottom: 5px;
+}
+
+#scenarios-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+#scenarios-list li {
     padding: 15px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#scenarios-list li:last-child {
+    border-bottom: none;
+}
+
+/* Generella knapp-stilar */
+.btn {
+    padding: 10px 15px;
     font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #007bff;
-    color: white;
-    transition: background-color 0.3s;
+    margin-right: 10px;
 }
 
-.event-btn:hover {
-    background-color: #0056b3;
-}
-
-.event-btn.disabled {
-    background-color: #cccccc;
-    cursor: not-allowed;
-}
-
-
-#feedback-area {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 5px;
-}
-
-.feedback-correct {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.feedback-incorrect {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-.feedback-neutral {
-     background-color: #e2e3e5;
-     color: #383d41;
-}
-
-.reset-btn {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    background-color: #6c757d;
-    color: white;
-    margin-top: 20px;
-}
-
-.reset-btn:hover {
-    background-color: #5a6268;
-}
+.btn-primary { background-color: #007bff; color: white; }
+.btn-secondary { background-color: #6c757d; color: white; }
+.delete-btn { background-color: #dc3545; color: white; padding: 5px 10px; font-size: 12px; }
